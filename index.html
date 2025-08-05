@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>US States Explorer - Interactive Learning Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            animation: fadeInDown 0.5s ease;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        .game-modes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .mode-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .mode-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .mode-card.active {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .mode-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .mode-description {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .game-area {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            min-height: 400px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .quiz-container {
+            display: none;
+        }
+
+        .quiz-container.active {
+            display: block;
+        }
+
+        .question {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #333;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .option-btn {
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .option-btn.correct {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            animation: pulse 0.5s ease;
+        }
+
+        .option-btn.incorrect {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            animation: shake 0.5s ease;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .facts-mode, .explorer-mode {
+            display: none;
+        }
+
+        .facts-mode.active, .explorer-mode.active {
+            display: block;
+        }
+
+        .state-card {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .state-name {
+            font-size: 2.5em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .fact-category {
+            background: #f7f8fc;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            animation: slideIn 0.3s ease;
+        }
+
+        .fact-title {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .fact-content {
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        .next-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+            transition: all 0.3s ease;
+        }
+
+        .next-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1em;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .state-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .state-item {
+            padding: 10px;
+            background: #f7f8fc;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .state-item:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #f0f0f0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2em; }
+            .game-modes { grid-template-columns: 1fr; }
+            .options { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🇺🇸 US States Explorer</h1>
+            <p class="subtitle">Learn about all 50 states through interactive games and facts!</p>
+        </header>
+
+        <div class="game-modes">
+            <div class="mode-card" onclick="startQuiz()">
+                <div class="mode-title">🎯 Capital Quiz</div>
+                <div class="mode-description">Test your knowledge of state capitals in this challenging quiz!</div>
+            </div>
+            <div class="mode-card" onclick="startFacts()">
+                <div class="mode-title">📚 Random Facts</div>
+                <div class="mode-description">Discover fascinating facts about each state!</div>
+            </div>
+            <div class="mode-card" onclick="startExplorer()">
+                <div class="mode-title">🗺️ State Explorer</div>
+                <div class="mode-description">Search and explore detailed information about any state!</div>
+            </div>
+            <div class="mode-card" onclick="startSizeGame()">
+                <div class="mode-title">📏 Size Challenge</div>
+                <div class="mode-description">Guess which state is larger in this comparison game!</div>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <div class="welcome-message" id="welcomeMessage">
+                <h2 style="text-align: center; color: #667eea; margin-bottom: 20px;">Welcome to US States Explorer!</h2>
+                <p style="text-align: center; font-size: 1.1em; color: #666;">Select a game mode above to start learning about the United States in a fun and interactive way!</p>
+            </div>
+
+            <div class="quiz-container" id="quizContainer">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill">0%</div>
+                </div>
+                <div class="question" id="question"></div>
+                <div class="options" id="options"></div>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="score">0</div>
+                        <div class="stat-label">Score</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="streak">0</div>
+                        <div class="stat-label">Streak</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="accuracy">0%</div>
+                        <div class="stat-label">Accuracy</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="facts-mode" id="factsMode">
+                <div class="state-card" id="stateCard"></div>
+                <button class="next-btn" onclick="getRandomFact()">Next State →</button>
+            </div>
+
+            <div class="explorer-mode" id="explorerMode">
+                <input type="text" class="search-box" id="searchBox" placeholder="Search for a state..." oninput="filterStates()">
+                <div class="state-list" id="stateList"></div>
+                <div class="state-card" id="explorerCard"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const statesData = {
+            'Alabama': { capital: 'Montgomery', nickname: 'The Heart of Dixie', admitted: '1819', area: '52,420 sq mi', population: '5.0M', fact: 'Home to the U.S. Space & Rocket Center', bird: 'Yellowhammer', flower: 'Camellia' },
+            'Alaska': { capital: 'Juneau', nickname: 'The Last Frontier', admitted: '1959', area: '665,384 sq mi', population: '731K', fact: 'Largest state by area, has 3 million lakes', bird: 'Willow Ptarmigan', flower: 'Forget-Me-Not' },
+            'Arizona': { capital: 'Phoenix', nickname: 'The Grand Canyon State', admitted: '1912', area: '113,990 sq mi', population: '7.3M', fact: 'Home to the Grand Canyon', bird: 'Cactus Wren', flower: 'Saguaro Cactus Blossom' },
+            'Arkansas': { capital: 'Little Rock', nickname: 'The Natural State', admitted: '1836', area: '53,179 sq mi', population: '3.0M', fact: 'Only place in the world where diamonds are mined and public can search', bird: 'Mockingbird', flower: 'Apple Blossom' },
+            'California': { capital: 'Sacramento', nickname: 'The Golden State', admitted: '1850', area: '163,695 sq mi', population: '39.5M', fact: 'Economy would be 5th largest in the world if independent', bird: 'California Valley Quail', flower: 'California Poppy' },
+            'Colorado': { capital: 'Denver', nickname: 'The Centennial State', admitted: '1876', area: '104,094 sq mi', population: '5.8M', fact: 'Has the highest elevation of any state', bird: 'Lark Bunting', flower: 'Rocky Mountain Columbine' },
+            'Connecticut': { capital: 'Hartford', nickname: 'The Constitution State', admitted: '1788', area: '5,543 sq mi', population: '3.6M', fact: 'Home to the first hamburger and first phone book', bird: 'American Robin', flower: 'Mountain Laurel' },
+            'Delaware': { capital: 'Dover', nickname: 'The First State', admitted: '1787', area: '2,489 sq mi', population: '990K', fact: 'First state to ratify the Constitution', bird: 'Blue Hen Chicken', flower: 'Peach Blossom' },
+            'Florida': { capital: 'Tallahassee', nickname: 'The Sunshine State', admitted: '1845', area: '65,758 sq mi', population: '21.5M', fact: 'Only state with two rivers with the same name', bird: 'Mockingbird', flower: 'Orange Blossom' },
+            'Georgia': { capital: 'Atlanta', nickname: 'The Peach State', admitted: '1788', area: '59,425 sq mi', population: '10.7M', fact: 'Birthplace of Coca-Cola', bird: 'Brown Thrasher', flower: 'Cherokee Rose' },
+            'Hawaii': { capital: 'Honolulu', nickname: 'The Aloha State', admitted: '1959', area: '10,932 sq mi', population: '1.5M', fact: 'Only U.S. state made up entirely of islands', bird: 'Nene (Hawaiian Goose)', flower: 'Hibiscus' },
+            'Idaho': { capital: 'Boise', nickname: 'The Gem State', admitted: '1890', area: '83,569 sq mi', population: '1.8M', fact: 'Produces more potatoes than any other state', bird: 'Mountain Bluebird', flower: 'Syringa' },
+            'Illinois': { capital: 'Springfield', nickname: 'The Prairie State', admitted: '1818', area: '57,914 sq mi', population: '12.7M', fact: 'Has more personalized license plates than any state', bird: 'Cardinal', flower: 'Violet' },
+            'Indiana': { capital: 'Indianapolis', nickname: 'The Hoosier State', admitted: '1816', area: '36,420 sq mi', population: '6.8M', fact: 'Home to the Indianapolis 500', bird: 'Cardinal', flower: 'Peony' },
+            'Iowa': { capital: 'Des Moines', nickname: 'The Hawkeye State', admitted: '1846', area: '56,273 sq mi', population: '3.2M', fact: 'Produces the most corn in the U.S.', bird: 'Eastern Goldfinch', flower: 'Wild Prairie Rose' },
+            'Kansas': { capital: 'Topeka', nickname: 'The Sunflower State', admitted: '1861', area: '82,278 sq mi', population: '2.9M', fact: 'Has more tornadoes per area than any other state', bird: 'Western Meadowlark', flower: 'Sunflower' },
+            'Kentucky': { capital: 'Frankfort', nickname: 'The Bluegrass State', admitted: '1792', area: '40,408 sq mi', population: '4.5M', fact: 'Produces 95% of the world\'s bourbon', bird: 'Cardinal', flower: 'Goldenrod' },
+            'Louisiana': { capital: 'Baton Rouge', nickname: 'The Pelican State', admitted: '1812', area: '52,378 sq mi', population: '4.6M', fact: 'Has parishes instead of counties', bird: 'Brown Pelican', flower: 'Magnolia' },
+            'Maine': { capital: 'Augusta', nickname: 'The Pine Tree State', admitted: '1820', area: '35,380 sq mi', population: '1.4M', fact: 'Has more coastline than California', bird: 'Chickadee', flower: 'White Pine Cone' },
+            'Maryland': { capital: 'Annapolis', nickname: 'The Old Line State', admitted: '1788', area: '12,406 sq mi', population: '6.2M', fact: 'State sport is jousting', bird: 'Baltimore Oriole', flower: 'Black-Eyed Susan' },
+            'Massachusetts': { capital: 'Boston', nickname: 'The Bay State', admitted: '1788', area: '10,554 sq mi', population: '7.0M', fact: 'Home to America\'s first public park', bird: 'Chickadee', flower: 'Mayflower' },
+            'Michigan': { capital: 'Lansing', nickname: 'The Great Lakes State', admitted: '1837', area: '96,714 sq mi', population: '10.1M', fact: 'Touches four of the five Great Lakes', bird: 'American Robin', flower: 'Apple Blossom' },
+            'Minnesota': { capital: 'Saint Paul', nickname: 'Land of 10,000 Lakes', admitted: '1858', area: '86,936 sq mi', population: '5.7M', fact: 'Actually has 11,842 lakes', bird: 'Common Loon', flower: 'Pink Lady\'s Slipper' },
+            'Mississippi': { capital: 'Jackson', nickname: 'The Magnolia State', admitted: '1817', area: '48,432 sq mi', population: '3.0M', fact: 'Root beer was invented here', bird: 'Mockingbird', flower: 'Magnolia' },
+            'Missouri': { capital: 'Jefferson City', nickname: 'The Show-Me State', admitted: '1821', area: '69,707 sq mi', population: '6.2M', fact: 'Has more than 6,000 caves', bird: 'Bluebird', flower: 'White Hawthorn' },
+            'Montana': { capital: 'Helena', nickname: 'The Treasure State', admitted: '1889', area: '147,040 sq mi', population: '1.1M', fact: 'Three times as many cows as people', bird: 'Western Meadowlark', flower: 'Bitterroot' },
+            'Nebraska': { capital: 'Lincoln', nickname: 'The Cornhusker State', admitted: '1867', area: '77,348 sq mi', population: '2.0M', fact: 'Has the largest hand-planted forest in the U.S.', bird: 'Western Meadowlark', flower: 'Goldenrod' },
+            'Nevada': { capital: 'Carson City', nickname: 'The Silver State', admitted: '1864', area: '110,572 sq mi', population: '3.1M', fact: 'Most mountainous state', bird: 'Mountain Bluebird', flower: 'Sagebrush' },
+            'New Hampshire': { capital: 'Concord', nickname: 'The Granite State', admitted: '1788', area: '9,349 sq mi', population: '1.4M', fact: 'Has the highest wind speed ever recorded', bird: 'Purple Finch', flower: 'Purple Lilac' },
+            'New Jersey': { capital: 'Trenton', nickname: 'The Garden State', admitted: '1787', area: '8,723 sq mi', population: '9.3M', fact: 'Has the most diners in the world', bird: 'Eastern Goldfinch', flower: 'Violet' },
+            'New Mexico': { capital: 'Santa Fe', nickname: 'Land of Enchantment', admitted: '1912', area: '121,590 sq mi', population: '2.1M', fact: 'Has more PhDs per capita than any other state', bird: 'Roadrunner', flower: 'Yucca Flower' },
+            'New York': { capital: 'Albany', nickname: 'The Empire State', admitted: '1788', area: '54,555 sq mi', population: '20.2M', fact: 'Home to the oldest state park in the U.S.', bird: 'Bluebird', flower: 'Rose' },
+            'North Carolina': { capital: 'Raleigh', nickname: 'The Tar Heel State', admitted: '1789', area: '53,819 sq mi', population: '10.4M', fact: 'First in flight - Wright Brothers', bird: 'Cardinal', flower: 'Dogwood' },
+            'North Dakota': { capital: 'Bismarck', nickname: 'The Peace Garden State', admitted: '1889', area: '70,698 sq mi', population: '779K', fact: 'Grows more sunflowers than any other state', bird: 'Western Meadowlark', flower: 'Wild Prairie Rose' },
+            'Ohio': { capital: 'Columbus', nickname: 'The Buckeye State', admitted: '1803', area: '44,826 sq mi', population: '11.8M', fact: 'Birthplace of more presidents than any other state', bird: 'Cardinal', flower: 'Scarlet Carnation' },
+            'Oklahoma': { capital: 'Oklahoma City', nickname: 'The Sooner State', admitted: '1907', area: '69,899 sq mi', population: '4.0M', fact: 'Has more man-made lakes than any other state', bird: 'Scissor-tailed Flycatcher', flower: 'Oklahoma Rose' },
+            'Oregon': { capital: 'Salem', nickname: 'The Beaver State', admitted: '1859', area: '98,379 sq mi', population: '4.2M', fact: 'Has the deepest lake in the U.S. (Crater Lake)', bird: 'Western Meadowlark', flower: 'Oregon Grape' },
+            'Pennsylvania': { capital: 'Harrisburg', nickname: 'The Keystone State', admitted: '1787', area: '46,054 sq mi', population: '13.0M', fact: 'Liberty Bell and birthplace of America', bird: 'Ruffed Grouse', flower: 'Mountain Laurel' },
+            'Rhode Island': { capital: 'Providence', nickname: 'The Ocean State', admitted: '1790', area: '1,545 sq mi', population: '1.1M', fact: 'Smallest state but has the longest official name', bird: 'Rhode Island Red', flower: 'Violet' },
+            'South Carolina': { capital: 'Columbia', nickname: 'The Palmetto State', admitted: '1788', area: '32,020 sq mi', population: '5.1M', fact: 'First state to secede from the Union', bird: 'Carolina Wren', flower: 'Yellow Jessamine' },
+            'South Dakota': { capital: 'Pierre', nickname: 'Mount Rushmore State', admitted: '1889', area: '77,116 sq mi', population: '887K', fact: 'Has more miles of shoreline than Florida', bird: 'Ring-necked Pheasant', flower: 'Pasque Flower' },
+            'Tennessee': { capital: 'Nashville', nickname: 'The Volunteer State', admitted: '1796', area: '42,144 sq mi', population: '6.9M', fact: 'Birthplace of country music', bird: 'Mockingbird', flower: 'Iris' },
+            'Texas': { capital: 'Austin', nickname: 'The Lone Star State', admitted: '1845', area: '268,596 sq mi', population: '29.1M', fact: 'Larger than any country in Europe', bird: 'Mockingbird', flower: 'Bluebonnet' },
+            'Utah': { capital: 'Salt Lake City', nickname: 'The Beehive State', admitted: '1896', area: '84,897 sq mi', population: '3.3M', fact: 'Has the greatest snow on earth', bird: 'California Gull', flower: 'Sego Lily' },
+            'Vermont': { capital: 'Montpelier', nickname: 'The Green Mountain State', admitted: '1791', area: '9,616 sq mi', population: '643K', fact: 'Produces the most maple syrup in the U.S.', bird: 'Hermit Thrush', flower: 'Red Clover' },
+            'Virginia': { capital: 'Richmond', nickname: 'The Old Dominion', admitted: '1788', area: '42,775 sq mi', population: '8.6M', fact: 'Birthplace of 8 U.S. presidents', bird: 'Cardinal', flower: 'American Dogwood' },
+            'Washington': { capital: 'Olympia', nickname: 'The Evergreen State', admitted: '1889', area: '71,362 sq mi', population: '7.7M', fact: 'Produces the most apples in the U.S.', bird: 'Willow Goldfinch', flower: 'Coast Rhododendron' },
+            'West Virginia': { capital: 'Charleston', nickname: 'The Mountain State', admitted: '1863', area: '24,230 sq mi', population: '1.8M', fact: 'Has the oldest population of any state', bird: 'Cardinal', flower: 'Rhododendron' },
+            'Wisconsin': { capital: 'Madison', nickname: 'The Badger State', admitted: '1848', area: '65,496 sq mi', population: '5.9M', fact: 'Produces the most cheese in the U.S.', bird: 'American Robin', flower: 'Wood Violet' },
+            'Wyoming': { capital: 'Cheyenne', nickname: 'The Equality State', admitted: '1890', area: '97,813 sq mi', population: '576K', fact: 'Least populous state but has Yellowstone', bird: 'Western Meadowlark', flower: 'Indian Paintbrush' }
+        };
+
+        let currentMode = '';
+        let score = 0;
+        let streak = 0;
+        let totalQuestions = 0;
+        let correctAnswers = 0;
+
+        function resetModes() {
+            document.getElementById('welcomeMessage').style.display = 'none';
+            document.getElementById('quizContainer').classList.remove('active');
+            document.getElementById('factsMode').classList.remove('active');
+            document.getElementById('explorerMode').classList.remove('active');
+            document.querySelectorAll('.mode-card').forEach(card => card.classList.remove('active'));
+        }
+
+        function startQuiz() {
+            resetModes();
+            currentMode = 'quiz';
+            document.getElementById('quizContainer').classList.add('active');
+            document.querySelectorAll('.mode-card')[0].classList.add('active');
+            score = 0;
+            streak = 0;
+            totalQuestions = 0;
+            correctAnswers = 0;
+            generateQuestion();
+        }
+
+        function generateQuestion() {
+            const states = Object.keys(statesData);
+            const correctState = states[Math.floor(Math.random() * states.length)];
+            const correctCapital = statesData[correctState].capital;
+            
+            document.getElementById('question').textContent = `What is the capital of ${correctState}?`;
+            
+            const options = [correctCapital];
+            while (options.length < 4) {
+                const randomState = states[Math.floor(Math.random() * states.length)];
+                const randomCapital = statesData[randomState].capital;
+                if (!options.includes(randomCapital)) {
+                    options.push(randomCapital);
+                }
+            }
+            
+            options.sort(() => Math.random() - 0.5);
+            
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+            
+            options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => checkAnswer(option, correctCapital);
+                optionsDiv.appendChild(btn);
+            });
+            
+            updateStats();
+        }
+
+        function checkAnswer(selected, correct) {
+            totalQuestions++;
+            const buttons = document.querySelectorAll('.option-btn');
+            
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                if (btn.textContent === correct) {
+                    btn.classList.add('correct');
+                } else if (btn.textContent === selected && selected !== correct) {
+                    btn.classList.add('incorrect');
+                }
+            });
+            
+            if (selected === correct) {
+                score += 10;
+                streak++;
+                correctAnswers++;
+            } else {
+                streak = 0;
+            }
+            
+            updateStats();
+            
+            setTimeout(() => {
+                generateQuestion();
+            }, 1500);
+        }
+
+        function updateStats() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('streak').textContent = streak;
+            const accuracy = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+            
+            const progress = totalQuestions > 0 ? Math.min((correctAnswers / 10) * 100, 100) : 0;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressFill').textContent = Math.round(progress) + '%';
+        }
+
+        function startFacts() {
+            resetModes();
+            currentMode = 'facts';
+            document.getElementById('factsMode').classList.add('active');
+            document.querySelectorAll('.mode-card')[1].classList.add('active');
+            getRandomFact();
+        }
+
+        function getRandomFact() {
+            const states = Object.keys(statesData);
+            const randomState = states[Math.floor(Math.random() * states.length)];
+            const data = statesData[randomState];
+            
+            const cardHTML = `
+                <div class="state-name">${randomState}</div>
+                <div class="fact-category">
+                    <div class="fact-title">Capital City</div>
+                    <div class="fact-content">${data.capital}</div>
+                </div>
+                <div class="fact-category">
+                    <div class="fact-title">Nickname</div>
+                    <div class="fact-content">${data.nickname}</div>
+                </div>
+                <div class="fact-category">
+                    <div class="fact-title">Fun Fact</div>
+                    <div class="fact-content">${data.fact}</div>
+                </div>
+                <div class="fact-category">
+                    <div class="fact-title">State Bird</div>
+                    <div class="fact-content">${data.bird}</div>
+                </div>
+                <div class="fact-category">
+                    <div class="fact-title">State Flower</div>
+                    <div class="fact-content">${data.flower}</div>
+                </div>
+                <div class="fact-category">
+                    <div class="fact-title">Area</div>
+                    <div class="fact-content">${data.area}</div>
+                </div>
+            `;
+            
+            document.getElementById('stateCard').innerHTML = cardHTML;
+        }
+
+        function startExplorer() {
+            resetModes();
+            currentMode = 'explorer';
+            document.getElementById('explorerMode').classList.add('active');
+            document.querySelectorAll('.mode-card')[2].classList.add('active');
+            populateStateList();
+        }
+
+        function populateStateList() {
+            const states = Object.keys(statesData);
+            const listHTML = states.map(state => 
+                `<div class="state-item" onclick="showStateDetails('${state}')">${state}</div>`
+            ).join('');
+            document.getElementById('stateList').innerHTML = listHTML;
+        }
+
+        function filterStates() {
+            const search = document.getElementById('searchBox').value.toLowerCase();
+            const states = Object.keys(statesData);
+            const filtered = states.filter(state => state.toLowerCase().includes(search));
+            
+            const listHTML = filtered.map(state => 
+                `<div class="state-item" onclick="showStateDetails('${state}')">${state}</div>`
+            ).join('');
+            document.getElementById('stateList').innerHTML = listHTML;
+        }
+
+        function showStateDetails(stateName) {
+            const data = statesData[stateName];
+            const cardHTML = `
+                <div class="state-name">${stateName}</div>
+                <div class="fact-category">
+                    <div class="fact-title">Capital</div>
+                    <div class="fact-content">${data.capital}</div>
+                </div>
+                <div class="fact-category">
+                    <div class="fact-title">Nickname</div>
+                    <div class="fact-content">${data.nickname}</div>
+                </div>
+                <div class="fact-category">
+                    <div class="fact-title">Year Admitted</div>
+                    <div class="fact-content">${data.admitted}</div>
+                </div>
+                <div class="fact-category">
+                    <div class="fact-title">Population</div>
+                    <div class="fact-content">${data.population}</div>
+                </div>
+                <div class="fact-category">
+                    <div class="fact-title">Area</div>
+                    <div class="fact-content">${data.area}</div>
+                </div>
+                <div class="fact-category">
+                    <div class="fact-title">Interesting Fact</div>
+                    <div class="fact-content">${data.fact}</div>
+                </div>
+            `;
+            document.getElementById('explorerCard').innerHTML = cardHTML;
+        }
+
+        function startSizeGame() {
+            resetModes();
+            currentMode = 'size';
+            document.getElementById('quizContainer').classList.add('active');
+            document.querySelectorAll('.mode-card')[3].classList.add('active');
+            score = 0;
+            streak = 0;
+            totalQuestions = 0;
+            correctAnswers = 0;
+            generateSizeQuestion();
+        }
+
+        function generateSizeQuestion() {
+            const states = Object.keys(statesData);
+            const state1 = states[Math.floor(Math.random() * states.length)];
+            let state2 = states[Math.floor(Math.random() * states.length)];
+            while (state2 === state1) {
+                state2 = states[Math.floor(Math.random() * states.length)];
+            }
+            
+            const area1 = parseInt(statesData[state1].area.replace(/[^0-9]/g, ''));
+            const area2 = parseInt(statesData[state2].area.replace(/[^0-9]/g, ''));
+            
+            document.getElementById('question').textContent = 'Which state is larger by area?';
+            
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+            
+            [state1, state2].forEach(state => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerHTML = `<div style="font-size: 1.3em; font-weight: bold;">${state}</div>
+                                <div style="font-size: 0.9em; opacity: 0.8; margin-top: 5px;">${statesData[state].nickname}</div>`;
+                btn.onclick = () => checkSizeAnswer(state, area1 > area2 ? state1 : state2, {[state1]: area1, [state2]: area2});
+                optionsDiv.appendChild(btn);
+            });
+            
+            updateStats();
+        }
+
+        function checkSizeAnswer(selected, correct, areas) {
+            totalQuestions++;
+            const buttons = document.querySelectorAll('.option-btn');
+            
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                const stateName = btn.querySelector('div').textContent;
+                if (stateName === correct) {
+                    btn.classList.add('correct');
+                    btn.innerHTML += `<div style="margin-top: 10px; font-size: 0.9em;">Area: ${statesData[stateName].area}</div>`;
+                } else {
+                    if (stateName === selected) {
+                        btn.classList.add('incorrect');
+                    }
+                    btn.innerHTML += `<div style="margin-top: 10px; font-size: 0.9em;">Area: ${statesData[stateName].area}</div>`;
+                }
+            });
+            
+            if (selected === correct) {
+                score += 10;
+                streak++;
+                correctAnswers++;
+            } else {
+                streak = 0;
+            }
+            
+            updateStats();
+            
+            setTimeout(() => {
+                generateSizeQuestion();
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
