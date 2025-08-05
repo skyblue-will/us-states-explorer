@@ -454,6 +454,9 @@
         let streak = 0;
         let totalQuestions = 0;
         let correctAnswers = 0;
+        let usedStates = [];
+        let questionCount = 0;
+        const MAX_QUESTIONS = 10;
 
         function resetModes() {
             document.getElementById('welcomeMessage').style.display = 'none';
@@ -472,15 +475,32 @@
             streak = 0;
             totalQuestions = 0;
             correctAnswers = 0;
+            usedStates = [];
+            questionCount = 0;
             generateQuestion();
         }
 
         function generateQuestion() {
+            // Check if quiz is complete
+            if (questionCount >= MAX_QUESTIONS) {
+                showQuizComplete();
+                return;
+            }
+            
             const states = Object.keys(statesData);
-            const correctState = states[Math.floor(Math.random() * states.length)];
+            
+            // Get unused states or reset if all used
+            let availableStates = states.filter(state => !usedStates.includes(state));
+            if (availableStates.length === 0) {
+                usedStates = [];
+                availableStates = states;
+            }
+            
+            const correctState = availableStates[Math.floor(Math.random() * availableStates.length)];
+            usedStates.push(correctState);
             const correctCapital = statesData[correctState].capital;
             
-            document.getElementById('question').textContent = `What is the capital of ${correctState}?`;
+            document.getElementById('question').innerHTML = `<div>Question ${questionCount + 1} of ${MAX_QUESTIONS}</div>What is the capital of ${correctState}?`;
             
             const options = [correctCapital];
             while (options.length < 4) {
@@ -506,9 +526,25 @@
             
             updateStats();
         }
+        
+        function showQuizComplete() {
+            const accuracy = Math.round((correctAnswers / MAX_QUESTIONS) * 100);
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = `
+                <div style="text-align: center; padding: 30px;">
+                    <h2 style="color: #667eea; margin-bottom: 20px;">Quiz Complete!</h2>
+                    <div style="font-size: 1.5em; margin: 10px 0;">Final Score: ${score}</div>
+                    <div style="font-size: 1.2em; margin: 10px 0;">Accuracy: ${accuracy}%</div>
+                    <div style="font-size: 1.2em; margin: 10px 0;">Correct: ${correctAnswers}/${MAX_QUESTIONS}</div>
+                    <button class="next-btn" onclick="startQuiz()">Play Again</button>
+                </div>
+            `;
+            document.getElementById('question').textContent = '';
+        }
 
         function checkAnswer(selected, correct) {
             totalQuestions++;
+            questionCount++;
             const buttons = document.querySelectorAll('.option-btn');
             
             buttons.forEach(btn => {
@@ -541,9 +577,9 @@
             const accuracy = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
             document.getElementById('accuracy').textContent = accuracy + '%';
             
-            const progress = totalQuestions > 0 ? Math.min((correctAnswers / 10) * 100, 100) : 0;
+            const progress = questionCount > 0 ? (questionCount / MAX_QUESTIONS) * 100 : 0;
             document.getElementById('progressFill').style.width = progress + '%';
-            document.getElementById('progressFill').textContent = Math.round(progress) + '%';
+            document.getElementById('progressFill').textContent = `${questionCount}/${MAX_QUESTIONS}`;
         }
 
         function startFacts() {
@@ -658,10 +694,18 @@
             streak = 0;
             totalQuestions = 0;
             correctAnswers = 0;
+            questionCount = 0;
+            usedStates = [];
             generateSizeQuestion();
         }
 
         function generateSizeQuestion() {
+            // Check if quiz is complete
+            if (questionCount >= MAX_QUESTIONS) {
+                showQuizComplete();
+                return;
+            }
+            
             const states = Object.keys(statesData);
             const state1 = states[Math.floor(Math.random() * states.length)];
             let state2 = states[Math.floor(Math.random() * states.length)];
@@ -672,7 +716,7 @@
             const area1 = parseInt(statesData[state1].area.replace(/[^0-9]/g, ''));
             const area2 = parseInt(statesData[state2].area.replace(/[^0-9]/g, ''));
             
-            document.getElementById('question').textContent = 'Which state is larger by area?';
+            document.getElementById('question').innerHTML = `<div>Question ${questionCount + 1} of ${MAX_QUESTIONS}</div>Which state is larger by area?`;
             
             const optionsDiv = document.getElementById('options');
             optionsDiv.innerHTML = '';
@@ -691,6 +735,7 @@
 
         function checkSizeAnswer(selected, correct, areas) {
             totalQuestions++;
+            questionCount++;
             const buttons = document.querySelectorAll('.option-btn');
             
             buttons.forEach(btn => {
