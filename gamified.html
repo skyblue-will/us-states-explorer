@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>US States Master - Level Up Your Geography!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .login-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 100%;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .login-title {
+            font-size: 2.5em;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .login-subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 5px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .avatar-selector {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .avatar-option {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .avatar-option:hover {
+            transform: scale(1.1);
+        }
+
+        .avatar-option.selected {
+            border-color: #667eea;
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.5);
+        }
+
+        .start-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .main-game {
+            display: none;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .top-bar {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            color: white;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .username {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .user-level {
+            font-size: 0.9em;
+            color: #667eea;
+        }
+
+        .xp-bar {
+            width: 200px;
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .xp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%);
+            transition: width 0.5s ease;
+        }
+
+        .stats-display {
+            display: flex;
+            gap: 20px;
+        }
+
+        .stat-badge {
+            background: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .stat-icon {
+            font-size: 1.2em;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: 250px 1fr 300px;
+            gap: 20px;
+        }
+
+        .sidebar {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-title {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .daily-challenges {
+            margin-bottom: 30px;
+        }
+
+        .challenge-item {
+            background: #f7f8fc;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .challenge-item:hover {
+            transform: translateX(5px);
+            background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
+        }
+
+        .challenge-item.completed {
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+
+        .challenge-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9em;
+        }
+
+        .challenge-reward {
+            color: #667eea;
+            font-size: 0.8em;
+            margin-top: 3px;
+        }
+
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .achievement-badge {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            background: #f0f0f0;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .achievement-badge.unlocked {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            animation: pulse 2s infinite;
+        }
+
+        .achievement-badge:hover {
+            transform: scale(1.1);
+        }
+
+        .main-content {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .game-modes {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .mode-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mode-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: left 0.5s ease;
+        }
+
+        .mode-card:hover::before {
+            left: 100%;
+        }
+
+        .mode-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .mode-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .mode-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .mode-xp {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .leaderboard {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .leaderboard-title {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .leaderboard-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .leaderboard-tab {
+            padding: 8px 15px;
+            background: #f0f0f0;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .leaderboard-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .leaderboard-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #f7f8fc;
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+
+        .leaderboard-rank {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+
+        .leaderboard-rank.gold {
+            background: linear-gradient(135deg, #f9d423 0%, #ff4e50 100%);
+        }
+
+        .leaderboard-rank.silver {
+            background: linear-gradient(135deg, #c0c0c0 0%, #808080 100%);
+        }
+
+        .leaderboard-rank.bronze {
+            background: linear-gradient(135deg, #cd7f32 0%, #8b4513 100%);
+        }
+
+        .leaderboard-name {
+            flex: 1;
+            font-weight: 600;
+        }
+
+        .leaderboard-score {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .game-area {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            min-height: 400px;
+            display: none;
+        }
+
+        .game-area.active {
+            display: block;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            display: none;
+            animation: slideInRight 0.5s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            display: block;
+        }
+
+        .notification-title {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .notification-message {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .combo-indicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+            display: none;
+            animation: comboAnimation 1s ease;
+            pointer-events: none;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes comboAnimation {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.5);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .game-grid {
+                grid-template-columns: 1fr;
+            }
+            .sidebar, .leaderboard {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .game-modes {
+                grid-template-columns: 1fr;
+            }
+            .stats-display {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-card">
+            <h1 class="login-title">🗽 US States Master</h1>
+            <p class="login-subtitle">Level up your geography knowledge!</p>
+            
+            <div class="input-group">
+                <label class="input-label">Choose Your Username</label>
+                <input type="text" class="input-field" id="usernameInput" placeholder="Enter a cool name..." maxlength="20">
+            </div>
+            
+            <div class="input-group">
+                <label class="input-label">Pick Your Avatar</label>
+                <div class="avatar-selector" id="avatarSelector">
+                    <div class="avatar-option selected" data-avatar="🦅">🦅</div>
+                    <div class="avatar-option" data-avatar="🗽">🗽</div>
+                    <div class="avatar-option" data-avatar="🏔️">🏔️</div>
+                    <div class="avatar-option" data-avatar="🌟">🌟</div>
+                    <div class="avatar-option" data-avatar="🎯">🎯</div>
+                    <div class="avatar-option" data-avatar="🚀">🚀</div>
+                    <div class="avatar-option" data-avatar="🏆">🏆</div>
+                    <div class="avatar-option" data-avatar="🎓">🎓</div>
+                    <div class="avatar-option" data-avatar="🦁">🦁</div>
+                    <div class="avatar-option" data-avatar="🐻">🐻</div>
+                </div>
+            </div>
+            
+            <button class="start-btn" onclick="startGame()">Start Your Journey!</button>
+        </div>
+    </div>
+
+    <!-- Main Game -->
+    <div class="main-game" id="mainGame">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">🦅</div>
+                <div class="user-details">
+                    <div class="username" id="displayUsername">Player</div>
+                    <div class="user-level">Level <span id="userLevel">1</span> - <span id="userTitle">Rookie Explorer</span></div>
+                    <div class="xp-bar">
+                        <div class="xp-fill" id="xpFill" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="stats-display">
+                <div class="stat-badge">
+                    <span class="stat-icon">🔥</span>
+                    <span class="stat-value" id="streakValue">0</span>
+                </div>
+                <div class="stat-badge">
+                    <span class="stat-icon">⭐</span>
+                    <span class="stat-value" id="totalXP">0 XP</span>
+                </div>
+                <div class="stat-badge">
+                    <span class="stat-icon">🏅</span>
+                    <span class="stat-value" id="achievementCount">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Grid -->
+        <div class="game-grid">
+            <!-- Left Sidebar -->
+            <div class="sidebar">
+                <div class="daily-challenges">
+                    <div class="sidebar-title">📅 Daily Challenges</div>
+                    <div id="challengesList">
+                        <div class="challenge-item" onclick="startChallenge('capitals')">
+                            <div class="challenge-title">Capital Master</div>
+                            <div class="challenge-reward">Get 5 capitals correct - 50 XP</div>
+                        </div>
+                        <div class="challenge-item" onclick="startChallenge('perfect')">
+                            <div class="challenge-title">Perfect Round</div>
+                            <div class="challenge-reward">100% accuracy in any quiz - 100 XP</div>
+                        </div>
+                        <div class="challenge-item" onclick="startChallenge('explorer')">
+                            <div class="challenge-title">State Explorer</div>
+                            <div class="challenge-reward">Learn about 10 states - 75 XP</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="achievements">
+                    <div class="sidebar-title">🏆 Achievements</div>
+                    <div class="achievements-grid" id="achievementsGrid">
+                        <div class="achievement-badge" title="First Steps">👣</div>
+                        <div class="achievement-badge" title="Quiz Master">🎯</div>
+                        <div class="achievement-badge" title="Explorer">🗺️</div>
+                        <div class="achievement-badge" title="Streak Hero">🔥</div>
+                        <div class="achievement-badge" title="Speed Demon">⚡</div>
+                        <div class="achievement-badge" title="Perfect Score">💯</div>
+                        <div class="achievement-badge" title="State Expert">🌟</div>
+                        <div class="achievement-badge" title="Daily Warrior">📅</div>
+                        <div class="achievement-badge" title="Legend">👑</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <div class="game-modes">
+                    <div class="mode-card" onclick="playMode('quiz')">
+                        <div class="mode-icon">🎯</div>
+                        <div class="mode-title">Capital Challenge</div>
+                        <div class="mode-xp">+10 XP per correct</div>
+                    </div>
+                    <div class="mode-card" onclick="playMode('speed')">
+                        <div class="mode-icon">⚡</div>
+                        <div class="mode-title">Speed Round</div>
+                        <div class="mode-xp">+15 XP with bonus</div>
+                    </div>
+                    <div class="mode-card" onclick="playMode('size')">
+                        <div class="mode-icon">📏</div>
+                        <div class="mode-title">Size Showdown</div>
+                        <div class="mode-xp">+12 XP per win</div>
+                    </div>
+                    <div class="mode-card" onclick="playMode('facts')">
+                        <div class="mode-icon">📚</div>
+                        <div class="mode-title">Fact Hunter</div>
+                        <div class="mode-xp">+5 XP per state</div>
+                    </div>
+                </div>
+
+                <div class="game-area" id="gameArea">
+                    <!-- Game content will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Right Sidebar - Leaderboard -->
+            <div class="leaderboard">
+                <div class="leaderboard-title">🏆 Leaderboard</div>
+                <div class="leaderboard-tabs">
+                    <div class="leaderboard-tab active" onclick="showLeaderboard('daily')">Today</div>
+                    <div class="leaderboard-tab" onclick="showLeaderboard('weekly')">Week</div>
+                    <div class="leaderboard-tab" onclick="showLeaderboard('all')">All Time</div>
+                </div>
+                <div class="leaderboard-list" id="leaderboardList">
+                    <!-- Leaderboard items will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification System -->
+    <div class="notification" id="notification">
+        <div class="notification-title" id="notificationTitle">Achievement Unlocked!</div>
+        <div class="notification-message" id="notificationMessage">You've earned your first badge!</div>
+    </div>
+
+    <!-- Combo Indicator -->
+    <div class="combo-indicator" id="comboIndicator">COMBO x3!</div>
+
+    <script src="game.js"></script>
+</body>
+</html>

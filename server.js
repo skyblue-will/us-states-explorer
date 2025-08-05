@@ -6,8 +6,13 @@ const PORT = process.env.PORT || 10000;
 // Serve static files (HTML, CSS, JS)
 app.use(express.static(__dirname));
 
-// Main route serves the interactive app
+// Main route serves the gamified version
 app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'gamified.html'));
+});
+
+// Original version still available
+app.get('/simple', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
