@@ -235,21 +235,34 @@
             max-height: 300px;
             overflow-y: auto;
             padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: #fafafa;
+            margin-bottom: 20px;
         }
 
         .state-item {
             padding: 10px;
-            background: #f7f8fc;
+            background: white;
+            border: 1px solid #e0e0e0;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
             text-align: center;
+            font-weight: 500;
         }
 
         .state-item:hover {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             transform: scale(1.05);
+            border-color: transparent;
+        }
+        
+        .state-item.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
         }
 
         .progress-bar {
@@ -388,9 +401,10 @@
             </div>
 
             <div class="explorer-mode" id="explorerMode">
-                <input type="text" class="search-box" id="searchBox" placeholder="Search for a state..." oninput="filterStates()">
+                <input type="text" class="search-box" id="searchBox" placeholder="Search for a state or click one below..." oninput="filterStates()">
+                <div style="margin: 15px 0; color: #667eea; font-weight: bold;">Select a state to view details:</div>
                 <div class="state-list" id="stateList"></div>
-                <div class="state-card" id="explorerCard"></div>
+                <div class="state-card" id="explorerCard" style="display: none;"></div>
             </div>
         </div>
     </div>
@@ -635,54 +649,85 @@
         }
 
         function populateStateList() {
-            const states = Object.keys(statesData);
+            const states = Object.keys(statesData).sort();
             const listHTML = states.map(state => 
-                `<div class="state-item" onclick="showStateDetails('${state}')">${state}</div>`
+                `<div class="state-item" id="state-${state.replace(/\s/g, '-')}" onclick="showStateDetails('${state}')">${state}</div>`
             ).join('');
             document.getElementById('stateList').innerHTML = listHTML;
+            document.getElementById('explorerCard').style.display = 'none';
         }
 
         function filterStates() {
             const search = document.getElementById('searchBox').value.toLowerCase();
-            const states = Object.keys(statesData);
+            const states = Object.keys(statesData).sort();
             const filtered = states.filter(state => state.toLowerCase().includes(search));
             
             const listHTML = filtered.map(state => 
-                `<div class="state-item" onclick="showStateDetails('${state}')">${state}</div>`
+                `<div class="state-item" id="state-${state.replace(/\s/g, '-')}" onclick="showStateDetails('${state}')">${state}</div>`
             ).join('');
             document.getElementById('stateList').innerHTML = listHTML;
+            
+            // Auto-show if only one result
+            if (filtered.length === 1) {
+                showStateDetails(filtered[0]);
+            }
         }
 
         function showStateDetails(stateName) {
+            // Clear previous selections
+            document.querySelectorAll('.state-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // Mark current as selected
+            const currentItem = document.getElementById(`state-${stateName.replace(/\s/g, '-')}`);
+            if (currentItem) {
+                currentItem.classList.add('selected');
+            }
+            
             const data = statesData[stateName];
             const cardHTML = `
-                <div class="state-name">${stateName}</div>
-                <div class="fact-category">
-                    <div class="fact-title">Capital</div>
-                    <div class="fact-content">${data.capital}</div>
-                </div>
-                <div class="fact-category">
-                    <div class="fact-title">Nickname</div>
-                    <div class="fact-content">${data.nickname}</div>
-                </div>
-                <div class="fact-category">
-                    <div class="fact-title">Year Admitted</div>
-                    <div class="fact-content">${data.admitted}</div>
-                </div>
-                <div class="fact-category">
-                    <div class="fact-title">Population</div>
-                    <div class="fact-content">${data.population}</div>
-                </div>
-                <div class="fact-category">
-                    <div class="fact-title">Area</div>
-                    <div class="fact-content">${data.area}</div>
-                </div>
-                <div class="fact-category">
-                    <div class="fact-title">Interesting Fact</div>
-                    <div class="fact-content">${data.fact}</div>
+                <div style="border-top: 3px solid #667eea; padding-top: 20px; margin-top: 20px;">
+                    <div class="state-name">${stateName}</div>
+                    <div class="fact-category">
+                        <div class="fact-title">Capital</div>
+                        <div class="fact-content">${data.capital}</div>
+                    </div>
+                    <div class="fact-category">
+                        <div class="fact-title">Nickname</div>
+                        <div class="fact-content">${data.nickname}</div>
+                    </div>
+                    <div class="fact-category">
+                        <div class="fact-title">Year Admitted</div>
+                        <div class="fact-content">${data.admitted}</div>
+                    </div>
+                    <div class="fact-category">
+                        <div class="fact-title">Population</div>
+                        <div class="fact-content">${data.population}</div>
+                    </div>
+                    <div class="fact-category">
+                        <div class="fact-title">Area</div>
+                        <div class="fact-content">${data.area}</div>
+                    </div>
+                    <div class="fact-category">
+                        <div class="fact-title">State Bird</div>
+                        <div class="fact-content">${data.bird}</div>
+                    </div>
+                    <div class="fact-category">
+                        <div class="fact-title">State Flower</div>
+                        <div class="fact-content">${data.flower}</div>
+                    </div>
+                    <div class="fact-category">
+                        <div class="fact-title">Interesting Fact</div>
+                        <div class="fact-content">${data.fact}</div>
+                    </div>
                 </div>
             `;
             document.getElementById('explorerCard').innerHTML = cardHTML;
+            document.getElementById('explorerCard').style.display = 'block';
+            
+            // Smooth scroll to details
+            document.getElementById('explorerCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
         function startSizeGame() {
