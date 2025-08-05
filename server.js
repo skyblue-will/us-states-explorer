@@ -33,5 +33,7 @@ app.get('/api/info', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`US States Explorer running on port ${PORT}`);
+  console.log(`US States Master (Gamified) running on port ${PORT}`);
+  console.log(`Main route: Gamified version`);
+  console.log(`Simple route: /simple for original`);
 });
