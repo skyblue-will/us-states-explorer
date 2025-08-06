@@ -860,3 +860,32 @@ function resetProgress() {
     }
     closeUserMenu();
 }
+
+// Mobile Tab Navigation
+function showMobileTab(tab) {
+    // Remove active class from all tabs
+    document.querySelectorAll('.mobile-tabs button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Hide all sections
+    document.querySelector('.main-content').classList.remove('mobile-active');
+    document.querySelector('.sidebar').classList.remove('mobile-active');
+    document.querySelector('.leaderboard').classList.remove('mobile-active');
+    
+    // Show selected section and activate tab
+    switch(tab) {
+        case 'games':
+            document.querySelector('.main-content').classList.add('mobile-active');
+            document.querySelectorAll('.mobile-tabs button')[0].classList.add('active');
+            break;
+        case 'challenges':
+            document.querySelector('.sidebar').classList.add('mobile-active');
+            document.querySelectorAll('.mobile-tabs button')[1].classList.add('active');
+            break;
+        case 'leaderboard':
+            document.querySelector('.leaderboard').classList.add('mobile-active');
+            document.querySelectorAll('.mobile-tabs button')[2].classList.add('active');
+            break;
+    }
+}
