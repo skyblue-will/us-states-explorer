@@ -249,12 +249,13 @@ function showQuizQuestion() {
             <div style="font-size: 1.8em; margin-bottom: 30px;">
                 What is the capital of <span style="color: #667eea; font-weight: bold;">${question.state}</span>?
             </div>
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-width: 500px; margin: 0 auto;">
-                ${question.options.map(option => `
-                    <button onclick="checkQuizAnswer('${option}', '${question.correct}')" 
-                            style="padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                                   color: white; border: none; border-radius: 10px; font-size: 1.1em; 
-                                   cursor: pointer; transition: all 0.3s ease;">
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-width: 600px; margin: 0 auto;">
+                ${question.options.map((option, index) => `
+                    <button id="quizBtn${index}" class="quiz-option-btn"
+                            style="padding: 25px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                                   color: white; border: none; border-radius: 10px; font-size: 1.2em; 
+                                   cursor: pointer; transition: all 0.3s ease; min-height: 80px;
+                                   display: flex; align-items: center; justify-content: center;">
                         ${option}
                     </button>
                 `).join('')}
@@ -275,10 +276,36 @@ function showQuizQuestion() {
             </div>
         </div>
     `;
+    
+    // Add event listeners after HTML is rendered
+    setTimeout(() => {
+        question.options.forEach((option, index) => {
+            const btn = document.getElementById(`quizBtn${index}`);
+            if (btn) {
+                btn.onclick = () => checkQuizAnswer(option, question.correct);
+            }
+        });
+    }, 10);
 }
 
 function checkQuizAnswer(selected, correct) {
+    // Disable all buttons immediately
+    document.querySelectorAll('.quiz-option-btn').forEach(btn => {
+        btn.disabled = true;
+        btn.style.opacity = '0.7';
+        btn.style.cursor = 'not-allowed';
+    });
+    
     const isCorrect = selected === correct;
+    
+    // Show correct/incorrect feedback
+    document.querySelectorAll('.quiz-option-btn').forEach(btn => {
+        if (btn.textContent.trim() === correct) {
+            btn.style.background = 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)';
+        } else if (btn.textContent.trim() === selected && !isCorrect) {
+            btn.style.background = 'linear-gradient(135deg, #eb3349 0%, #f45c43 100%)';
+        }
+    });
     
     if (isCorrect) {
         gameState.streak++;
