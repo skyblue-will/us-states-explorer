@@ -111,6 +111,23 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Generate mock leaderboard
     generateLeaderboard('daily');
+    
+    // Quick login for testing - check URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('quickstart') === 'true') {
+        // Auto-login with test user
+        gameState.user = {
+            username: 'TestUser',
+            avatar: '🎮',
+            level: 1,
+            totalXP: 0,
+            achievements: [],
+            joinDate: new Date().toISOString()
+        };
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('mainGame').style.display = 'block';
+        updateUserDisplay();
+    }
 });
 
 // Start Game
