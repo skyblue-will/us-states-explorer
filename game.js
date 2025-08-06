@@ -106,6 +106,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Load existing users for family selection
+    loadExistingUsers();
+    
     // Load saved user data
     loadUserData();
     
@@ -887,5 +890,104 @@ function showMobileTab(tab) {
             document.querySelector('.leaderboard').classList.add('mobile-active');
             document.querySelectorAll('.mobile-tabs button')[2].classList.add('active');
             break;
+    }
+}
+
+// Load and display existing users for family selection
+function loadExistingUsers() {
+    const allUsers = getAllUsers();
+    
+    if (allUsers.length > 0) {
+        const existingUsersSection = document.getElementById('existingUsersSection');
+        const existingUsersList = document.getElementById('existingUsersList');
+        
+        existingUsersSection.style.display = 'block';
+        existingUsersList.innerHTML = '';
+        
+        allUsers.forEach(user => {
+            const userBtn = document.createElement('button');
+            userBtn.className = 'existing-user-btn';
+            userBtn.innerHTML = `
+                <div class="existing-user-avatar">${user.avatar || '🦅'}</div>
+                <div class="existing-user-info">
+                    <div class="existing-user-name">${user.username}</div>
+                    <div class="existing-user-stats">Level ${user.level || 1} • ${user.totalXP || 0} XP</div>
+                </div>
+            `;
+            userBtn.onclick = () => selectExistingUser(user);
+            existingUsersList.appendChild(userBtn);
+        });
+    }
+}
+
+// Get all users from localStorage
+function getAllUsers() {
+    const users = [];
+    
+    // Check for current user
+    const currentState = localStorage.getItem('gameState');
+    if (currentState) {
+        const parsed = JSON.parse(currentState);
+        if (parsed.user) {
+            users.push(parsed.user);
+        }
+    }
+    
+    // Check for saved users list
+    const savedUsers = localStorage.getItem('allUsers');
+    if (savedUsers) {
+        const usersList = JSON.parse(savedUsers);
+        // Add users not already in the list
+        usersList.forEach(user => {
+            if (!users.find(u => u.username === user.username)) {
+                users.push(user);
+            }
+        });
+    }
+    
+    return users;
+}
+
+// Select an existing user
+function selectExistingUser(user) {
+    // Load user data
+    gameState.user = user;
+    gameState.totalXP = user.totalXP || 0;
+    gameState.level = user.level || 1;
+    gameState.achievements = user.achievements || [];
+    gameState.statesVisited = user.statesVisited || [];
+    gameState.dailyStreak = user.dailyStreak || 0;
+    
+    // Save and start game
+    saveGameState();
+    showMainGame();
+}
+
+// Update saveGameState to also save to allUsers
+const originalSaveGameState = saveGameState;
+saveGameState = function() {
+    originalSaveGameState();
+    
+    // Also save to all users list
+    if (gameState.user) {
+        let allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+        const existingIndex = allUsers.findIndex(u => u.username === gameState.user.username);
+        
+        const userData = {
+            ...gameState.user,
+            totalXP: gameState.totalXP,
+            level: gameState.level,
+            achievements: gameState.achievements,
+            statesVisited: gameState.statesVisited,
+            dailyStreak: gameState.dailyStreak
+        };
+        
+        if (existingIndex >= 0) {
+            allUsers[existingIndex] = userData;
+        } else {
+            allUsers.push(userData);
+        }
+        
+        localStorage.setItem('allUsers', JSON.stringify(allUsers));
     }
 }

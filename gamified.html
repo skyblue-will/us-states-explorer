@@ -124,6 +124,57 @@
             box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
         }
 
+        .existing-user-btn {
+            width: 100%;
+            padding: 15px;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .existing-user-btn:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .existing-user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3em;
+            color: white;
+        }
+
+        .existing-user-info {
+            flex: 1;
+            text-align: left;
+        }
+
+        .existing-user-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 3px;
+        }
+
+        .existing-user-stats {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .existing-user-btn:hover .existing-user-stats {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
         .main-game {
             display: none;
             padding: 20px;
@@ -652,8 +703,17 @@
             <h1 class="login-title">🗽 US States Master</h1>
             <p class="login-subtitle">Level up your geography knowledge!</p>
             
+            <!-- Existing Users Section -->
+            <div id="existingUsersSection" style="display: none; margin-bottom: 20px;">
+                <label class="input-label">Select Existing Player</label>
+                <div id="existingUsersList" style="display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 15px;"></div>
+                <div style="text-align: center; margin: 15px 0;">
+                    <span style="color: #999;">— OR —</span>
+                </div>
+            </div>
+            
             <div class="input-group">
-                <label class="input-label">Choose Your Username</label>
+                <label class="input-label">Create New Player</label>
                 <input type="text" class="input-field" id="usernameInput" placeholder="Enter a cool name..." maxlength="20">
             </div>
             
