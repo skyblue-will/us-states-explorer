@@ -750,6 +750,33 @@ function checkDailyStreak() {
     saveUserData();
 }
 
+// Data Persistence Functions
+function saveUserData() {
+    if (gameState.user) {
+        localStorage.setItem('gameState', JSON.stringify(gameState));
+    }
+}
+
+function loadUserData() {
+    const saved = localStorage.getItem('gameState');
+    if (saved) {
+        try {
+            const loadedState = JSON.parse(saved);
+            Object.assign(gameState, loadedState);
+            
+            // If user exists, skip login
+            if (gameState.user) {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainGame').style.display = 'block';
+                updateUserDisplay();
+                checkDailyStreak();
+            }
+        } catch (e) {
+            console.error('Failed to load saved data:', e);
+        }
+    }
+}
+
 // Data Persistence
 function saveUserData() {
     localStorage.setItem('gameState', JSON.stringify(gameState));
@@ -795,8 +822,9 @@ function closeUserMenu() {
 
 function switchUser() {
     closeUserMenu();
-    gameState.user = null;
-    localStorage.removeItem('currentUser');
+    // Clear the entire game state to force login screen
+    localStorage.removeItem('gameState');
+    localStorage.removeItem('lastPlayed');
     location.reload();
 }
 
