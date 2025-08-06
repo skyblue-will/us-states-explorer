@@ -753,9 +753,65 @@ function loadUserData() {
     }
 }
 
-// Logout function
+// Logout function with options
 function logout() {
-    if (confirm('Are you sure you want to logout? Your progress will be saved.')) {
+    const choice = confirm('Click OK to switch users (keeps all data)\nClick Cancel to go back');
+    
+    if (choice) {
+        // Just reload to show login screen again
+        gameState.user = null;
+        localStorage.removeItem('currentUser');
         location.reload();
     }
+}
+
+// User Menu Functions
+function showUserMenu() {
+    const modal = document.getElementById('userMenuModal');
+    modal.style.display = 'flex';
+}
+
+function closeUserMenu() {
+    const modal = document.getElementById('userMenuModal');
+    modal.style.display = 'none';
+}
+
+function switchUser() {
+    closeUserMenu();
+    gameState.user = null;
+    localStorage.removeItem('currentUser');
+    location.reload();
+}
+
+function exportProgress() {
+    const data = {
+        username: gameState.user.username,
+        level: gameState.level,
+        totalXP: gameState.totalXP,
+        achievements: gameState.achievements,
+        statesVisited: gameState.statesVisited,
+        dailyStreak: gameState.dailyStreak,
+        exportDate: new Date().toISOString()
+    };
+    
+    const dataStr = JSON.stringify(data, null, 2);
+    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${gameState.user.username}_progress_${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
+    
+    showNotification('Export Complete', 'Your progress has been downloaded!');
+    closeUserMenu();
+}
+
+function resetProgress() {
+    if (confirm('WARNING: This will delete ALL your progress and achievements. Are you sure?')) {
+        if (confirm('This cannot be undone. Really delete everything?')) {
+            localStorage.clear();
+            location.reload();
+        }
+    }
+    closeUserMenu();
 }
